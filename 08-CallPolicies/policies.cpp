@@ -3,6 +3,7 @@
 
 class Example {
     Example(std::string n) : mName(n) {}
+    ~Example () {}; // we should do manual destructor in cpp, see [singleton](http://pybind11.readthedocs.io/en/stable/advanced/classes.html#non-public-destructors)
     std::string mName;
 public:
     std::string name() const { return mName; }
@@ -17,19 +18,15 @@ public:
     }
 };
 
-#include <boost/python.hpp>
-using namespace boost::python;
 
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
 
-BOOST_PYTHON_MODULE(policies)
+PYBIND11_MODULE ( policies, m )
 {
-    class_<Example>("Example", no_init)
+    py::class_<Example, std::unique_ptr<Example, py::nodelete>>(m, "Example")
         .def("__str__", &Example::name)
-        .def("factory", &Example::factory,
-            return_value_policy<manage_new_object>())
-        .staticmethod("factory")
-        .def("singleton", &Example::singleton,
-            return_value_policy<reference_existing_object>())
-        .staticmethod("singleton")
+        .def_static("factory", &Example::factory) // even we use def_static, it seems that it has same result compared with def
+        .def_static("singleton", &Example::singleton)
     ;
-}	
+}

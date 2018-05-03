@@ -15,6 +15,7 @@ struct Ctor
     std::string mMsg;
 };
 
+/*
 #include <boost/python.hpp>
 using namespace boost::python;
 
@@ -27,5 +28,17 @@ BOOST_PYTHON_MODULE(ctor)
     ;
 
 }
+*/
 
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
 
+PYBIND11_MODULE ( ctor, m )
+{
+    py::class_<Ctor> (m, "Ctor")//, py::init<std::string>())
+        .def(py::init<std::string> () )
+        .def(py::init<double, double>())
+        .def("greet", &Ctor::greet)
+        .def("set", &Ctor::set)
+    ;
+}

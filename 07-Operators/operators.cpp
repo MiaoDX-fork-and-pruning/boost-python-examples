@@ -32,16 +32,18 @@ NumberLike operator+(NumberLike n, int i)
     return n;
 };
 
-#include <boost/python.hpp>
-using namespace boost::python;
 
+#include <pybind11/pybind11.h>
+#include <pybind11/operators.h>
+namespace py = pybind11;
 
-BOOST_PYTHON_MODULE(operators)
+PYBIND11_MODULE ( operators, m )
 {
-    class_<NumberLike>("NumberLike")
-        .def(init< optional<int> >())
-        .def(self + int())
+    py::class_<NumberLike> ( m, "NumberLike" )
+        .def ( py::init<int> (), py::arg ( "n" ) = 0 ) // there should be better ones
+        //.def ( py::init<> ( NumberLike::NumberLike ))
+        .def(py::self + int())
         .def("__str__", &NumberLike::str)
         .def("__repr__", &NumberLike::repr)
     ;
-}	
+}

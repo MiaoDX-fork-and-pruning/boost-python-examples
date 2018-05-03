@@ -1,5 +1,6 @@
 
-PYTHON_ADD_MODULE(member member.cpp)
+pybind11_add_module(member member.cpp)
+# PYTHON_ADD_MODULE(member member.cpp)
 FILE(COPY member.py DESTINATION .)
 ADD_TEST(NAME 04-ClassMembers COMMAND ${PYTHON_EXECUTABLE} member.py)
 

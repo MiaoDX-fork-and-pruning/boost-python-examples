@@ -10,12 +10,24 @@ void someFunction() {
     throw OutOfSteakException();
 };
 
-#include "boost/python.hpp"
-using namespace boost::python;
 
-BOOST_PYTHON_MODULE(myexceptions)
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+
+PYBIND11_MODULE ( myexceptions, m )
 {
-    register_exception_translator<OutOfSteakException>(translateException);
+    // register_exception_translator<OutOfSteakException>(translateException); // boost.python
 
-    def("someFunction", someFunction);
+    // THIS is somewhat not straight forward compared with boost.python one
+    py::register_exception_translator ( []( std::exception_ptr p ) {
+        try {
+            if ( p ) std::rethrow_exception ( p );
+        }
+        catch ( const OutOfSteakException &e ) {
+            // Set MyException as the active python error
+            translateException ( e );
+        }
+    } );
+
+    m.def ( "someFunction", someFunction );
 }

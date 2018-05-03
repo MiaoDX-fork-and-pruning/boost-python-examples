@@ -23,6 +23,30 @@ private:
     std::vector<std::string> mS;
 };
 
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+
+PYBIND11_MODULE ( iterators, m )
+{
+    py::class_<Example> ( m, "Example" )
+        .def ( py::init<> () ) // THIS IS MUST
+
+/*
+        // OK if the mS is public
+        .def ( "strings", []( const Example &e ) { return py::make_iterator ( e.mS.begin (), e.mS.end () ); },
+            py::keep_alive<0, 1> ()  // Essential: keep object alive while iterator exists
+        )
+*/
+
+    .def ( "strings", []( Example &e ) { return py::make_iterator ( e.begin(), e.end () ); },
+    py::keep_alive<0, 1> ()  //Essential: keep object alive while iterator exists
+    )
+
+    .def("add", &Example::add)
+    ;
+}
+
+/*
 #include <boost/python.hpp>
 using namespace boost::python;
 
@@ -33,3 +57,5 @@ BOOST_PYTHON_MODULE(iterators)
         .def("add", &Example::add)
     ;
 }	
+*/
+

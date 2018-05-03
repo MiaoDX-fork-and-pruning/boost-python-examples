@@ -30,6 +30,27 @@ private:
     std::string mS;
 };
 
+
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+
+PYBIND11_MODULE ( overload, m )
+{
+    void        (Example::*d1)()             = &Example::doit;
+    std::string (Example::*d2)(unsigned int) = &Example::doit;
+    void        (Example::*d3)(std::string)  = &Example::doit;
+
+    py::class_<Example>(m, "Example")
+        .def ( py::init<> ())
+        .def("__str__", &Example::print)
+        .def("doit", d1)
+        .def("doit", d2)
+        .def("doit", d3)
+        .def("makeIt", &Example::makeIt, py::arg ( "s" ) = "", py::arg ( "n" ) = 1, py::arg ( "t" ) = "" ) // this may not be so good as a overload demo, since we have to specify all the paras manually
+    ;
+}
+
+/*
 #include <boost/python.hpp>
 using namespace boost::python;
 
@@ -49,3 +70,4 @@ BOOST_PYTHON_MODULE(overload)
         .def("makeIt", &Example::makeIt, makeIt_overloads())
     ;
 }	
+*/

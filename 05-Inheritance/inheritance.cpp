@@ -29,19 +29,22 @@ Base* factory()
     return new Derived;
 }
 
-#include <boost/python.hpp>
-using namespace boost::python;
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
 
-BOOST_PYTHON_MODULE(inheritance)
+PYBIND11_MODULE ( inheritance, m )
 {
-    class_<Base, boost::noncopyable>("Base")
-        .def("name", &Base::name)
-    ;
+    py::class_<Base> ( m, "Base" )
+        .def ( py::init<> () )
+        .def ( "name", &Base::name )
+        ;
 
-    class_<Derived, bases<Base> >("Derived")
-    ;
+    py::class_<Derived, Base > ( m, "Derived" )
+        .def ( py::init<> () )
+        ;
 
-    def("fb", fb);
-    def("fd", fd);
-    def("factory", factory, return_value_policy<manage_new_object>());
-}	
+    m.def ( "fb", fb );
+    m.def ( "fd", fd );
+    // m.def ( "factory", factory, py::return_value_policy<manage_new_object> () );
+    m.def ( "factory", factory);
+}

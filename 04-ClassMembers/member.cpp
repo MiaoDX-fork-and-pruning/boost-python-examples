@@ -21,16 +21,15 @@ private:
 };
 
 
-#include <boost/python.hpp>
-using namespace boost::python;
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
 
-BOOST_PYTHON_MODULE(member)
+PYBIND11_MODULE ( member, m )
 {
-    class_<SomeClass>("SomeClass", init<std::string>())
+    py::class_<SomeClass>(m, "SomeClass")
+        .def(py::init<std::string> (), py::arg ( "" ) = "class_name" )
         .def_readwrite("name", & SomeClass::name)
-        .add_property("number", &SomeClass::getNumber, &SomeClass::setNumber)
+        //.add_property("number", &SomeClass::getNumber, &SomeClass::setNumber)
+        .def_property ("number", &SomeClass::getNumber, &SomeClass::setNumber )        
     ;
-
 }
-
-
